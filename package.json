@@ -1,0 +1,18 @@
+{
+  "name": "aperta",
+  "private": true,
+  "workspaces": [
+    "screening",
+    "web",
+    "scripts"
+  ],
+  "scripts": {
+    "test": "npm test -w screening && cd contract && cargo test",
+    "dev": "npm run dev -w web",
+    "build": "npm run build -w web",
+    "sim": "DEMO_SIMULATE=true npm run dev -w web",
+    "accounts": "node scripts/setup-accounts.mjs",
+    "deploy": "node scripts/deploy.mjs",
+    "merapi": "node scripts/setup-merapi.mjs"
+  }
+}

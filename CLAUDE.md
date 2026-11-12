@@ -19,6 +19,10 @@ Waktunya sangat sempit: deadline Sabtu 14 Nov 2026 23:59 UTC, target submit Sabt
 
 ## 3. Hal yang terkunci
 
+- APERTA adalah **platform lomba foto umum** dengan login dompet NEAR testnet. Halaman `/demo` hanya cadangan tanpa dompet.
+- **Semua teks web dan README berbahasa Inggris.** Penjelasan ke Dilly tetap bahasa Indonesia.
+- Tampilan mengikuti Claude Design "APERTA — Desain Web" (https://claude.ai/artifact/XybtCNkXsFFGKZ3Pxk5CbY) dan token di `web/app/globals.css`. Logo: 6 bilah diafragma + bukaan lime (`web/components/Logo.tsx`).
+
 - Cerita demo di `PLAN.md` R1–R3: "Lomba Foto Senja Jogja 2026", pembagian 50/30/20, lima karya (3 asli, 1 AI, 1 curian dari Alif), dan lomba "Merapi 2026" milik Alif.
 - Fitur di luar lingkup (lihat Scope Boundaries). Jangan menambah fitur yang tidak ada di PLAN.md.
 - Kata "100% anti-curang" tidak boleh dipakai di UI maupun README.
@@ -26,7 +30,7 @@ Waktunya sangat sempit: deadline Sabtu 14 Nov 2026 23:59 UTC, target submit Sabt
 ## 4. Tidak boleh sama sekali
 
 - Memakai mainnet atau uang asli.
-- Menulis kunci privat, seed phrase, atau API key ke file selain `.env`. Jangan pernah commit `.env`.
+- Menulis kunci privat, seed phrase, atau API key ke file selain `web/.env.local` / `.env`. Jangan pernah commit file env.
 - Mengunggah file RAW utuh ke server. ARW tetap WAJIB dibaca, tapi di browser (PLAN.md KTD6). Pemeriksaan RAW adalah fitur inti: jangan dihapus, dilewati, atau dipalsukan.
 - `git push --force`, `git reset --hard`, atau menghapus riwayat git.
 - Membuat repo publik, posting di X, atau mengisi form hackathon. Itu tugas Dilly.
@@ -49,7 +53,9 @@ Waktunya sangat sempit: deadline Sabtu 14 Nov 2026 23:59 UTC, target submit Sabt
 ## 7. Perintah penting
 
 - Tes kontrak: `cd contract && cargo test`
-- Tes penyaringan: `npm test -w web`
+- Tes penyaringan: `npm test -w screening`
 - Build web: `npm run build -w web`
 - Jalankan lokal: `npm run dev`
-- Putar cerita penuh di testnet: `npm run demo`
+- Web tanpa blockchain (simulasi): `npm run sim`
+- Akun + deploy: `npm run accounts -- <nama>` lalu `npm run deploy`
+- Daftarkan foto Alif lebih dulu: `npm run merapi -- <url web>`

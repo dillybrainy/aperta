@@ -102,7 +102,7 @@ Kedua, peserta tidak punya jaminan apa pun: hadiah lomba kecil sering telat atau
 ### Acceptance Examples
 
 - AE1. Covers R2, R13, R15. **Given** karya AI tanpa RAW dan metadata kosong, **when** penyaringan berjalan, **then** hasilnya Ditolak dengan alasan "tidak ada RAW", "metadata kosong", dan skor AI tinggi, dan tercatat on-chain.
-- AE2. Covers R3, R14. **Given** karya Alif sudah terdaftar di "Lomba Foto Merapi 2026", **when** salinannya dikirim ke lomba Senja Jogja, **then** hasilnya Perlu dicek dengan alasan "mirip X% dengan karya Alif, terdaftar <tanggal>".
+- AE2. Covers R3, R14. **Given** karya Alif sudah terdaftar di "Lomba Foto Merapi 2026", **when** salinannya dikirim ke lomba Senja Jogja oleh peserta lain, **then** alasannya menyebut "Kemungkinan foto curian: X% mirip karya Alif, terdaftar <tanggal>". Status Ditolak bila pencuri tidak punya RAW (kasus nyata), atau Perlu dicek bila hanya kemiripan yang bermasalah.
 - AE3. Covers R7. **Given** tiga karya Lolos dengan nilai rata-rata 88, 81, 74, **when** lomba ditutup, **then** pemiliknya menerima 50%, 30%, dan 20% hadiah dalam satu transaksi.
 - AE4. Covers R16. **Given** agen hanya punya kunci terbatas, **when** agen mencoba memanggil fungsi penutup lomba atau mentransfer NEAR, **then** blockchain menolak dan UI menampilkan error aslinya beserta link NearBlocks.
 
@@ -229,7 +229,7 @@ Kalau waktu mepet, potong dari bawah: P2 → banding → frame tetangga → kepu
 - **Goal:** Repo yang bisa langsung dikerjakan Claude Code dengan rahasia yang aman.
 - **Requirements:** R20.
 - **Dependencies:** tidak ada.
-- **Files:** `package.json` (workspaces `web`, `scripts`), `.env.example`, `.gitignore`, `LICENSE`, `README.md` (kerangka), `PLAN.md`, `CLAUDE.md`, `docs/progress.md`, folder `contract/`, `web/`, `scripts/`, `samples/`, `docs/`.
+- **Files:** `package.json` (workspaces `web`, `screening`, `scripts`), `.env.example`, `.gitignore`, `LICENSE`, `README.md` (kerangka), `PLAN.md`, `CLAUDE.md`, `docs/progress.md`, folder `contract/`, `web/`, `scripts/`, `samples/`, `docs/`.
 - **Approach:**
   1. `.env.example`: `NEAR_NETWORK=testnet`, `CONTRACT_ID`, `ORGANIZER_*`, `JUROR_*`, `PARTICIPANT_*`, `AGENT_ACCOUNT_ID`, `AGENT_PRIVATE_KEY`, `NEARAI_API_KEY`, `DEMO_MODE=true`.
   2. Buat akun testnet: master, kontrak, penyelenggara, 2 juri, 5 peserta (termasuk Alif), agen.
@@ -282,7 +282,7 @@ Kalau waktu mepet, potong dari bawah: P2 → banding → frame tetangga → kepu
 - **Goal:** Satu fungsi yang menerima data karya dan menghasilkan Lolos / Perlu dicek / Ditolak beserta alasan per lapis.
 - **Requirements:** R9, R11–R15, R21, R24, KTD6, KTD7, KTD9.
 - **Dependencies:** U1. Pencatatan on-chain butuh U3.
-- **Files:** `web/lib/screening/` (`raw.ts`, `metadata.ts`, `ai-score.ts`, `phash.ts`, `neighbors.ts` P1, `c2pa.ts` P2, `decide.ts`), `web/lib/screening/fixtures/` (hasil tersimpan 5 karya demo), `web/lib/screening/*.test.ts`, `samples/`.
+- **Files:** `screening/` (workspace terpisah `@aperta/screening`, dipakai oleh web): `src/raw.ts`, `src/metadata.ts`, `src/phash.ts`, `src/ai.ts`, `src/layers.ts`, `src/index.ts`, `test/`, plus `samples/` dan fixture demo. **Sudah dibuat dan 16 tes lulus.**
 - **Approach:**
   1. Bagian browser: baca metadata dan preview RAW, hitung SHA-256 JPEG, lalu perkecil gambar sebelum dikirim.
   2. Bagian server: bandingkan preview RAW dengan JPEG (perceptual hash), cek metadata, minta skor AI ke NEAR AI Cloud, bandingkan perceptual hash dengan `list_phashes` dari kontrak, lalu putuskan (KTD9).
@@ -337,7 +337,7 @@ Kalau waktu mepet, potong dari bawah: P2 → banding → frame tetangga → kepu
 | Bukti | Perintah |
 |---|---|
 | Tes kontrak | `cd contract && cargo test` |
-| Tes penyaringan | `npm test -w web` |
+| Tes penyaringan | `npm test -w screening` |
 | Build web | `npm run build -w web` |
 | Cerita penuh di testnet | `npm run demo` |
 | Repo jalan dari nol | `cp .env.example .env && npm install && npm run dev` di clone baru |
@@ -374,3 +374,16 @@ Kalau waktu mepet, potong dari bawah: P2 → banding → frame tetangga → kepu
 - Library pembaca RAW dan perceptual hash yang dipakai.
 - Model penglihatan dan prompt di NEAR AI Cloud.
 - Nilai ambang persis di KTD9.
+
+
+---
+
+## Perubahan 12 Nov (disetujui Dilly)
+
+- **Lingkup:** dari web demo menjadi **platform lomba foto umum** dengan login dompet NEAR testnet (near-connect). Halaman: Home, Contests, Contest detail, Submit, Host a contest, Jury, Results. Mode demo juri tanpa dompet tetap ada di `/demo` sebagai cadangan (R18).
+- **Bahasa:** semua teks web, alasan penyaringan on-chain, dan README memakai bahasa Inggris.
+- **Kontrak:** `create_contest` menerima `description?`, `closes_at_ms?`, `cover_url?`; `submit_entry` menerima `title?` dan menolak karya setelah `closes_at_ms`; view baru `list_contests`.
+- **Penyimpanan foto:** salinan 1600 px + preview RAW di Vercel Blob dengan path ber-HMAC; foto penuh hanya disajikan setelah tahap Penjurian (R10). File RAW utuh tetap tidak pernah diunggah (KTD6).
+- **Demo agen curang (AE4):** tombol "Try a rogue agent" di halaman lomba + langkah di `/demo`.
+- **Desain:** Claude Design "APERTA — Desain Web"; logo baru (6 bilah diafragma + bukaan lime).
+- **Frame tetangga (R21):** ada di `screening/` dan teruji, tapi belum ada di form submit (P1).
