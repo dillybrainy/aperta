@@ -1,0 +1,13 @@
+{
+  "name": "@aperta/scripts",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "accounts": "node setup-accounts.mjs",
+    "deploy": "node deploy.mjs",
+    "merapi": "node setup-merapi.mjs"
+  },
+  "dependencies": {
+    "near-api-js": "^7.5.3"
+  }
+}
